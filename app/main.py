@@ -4,7 +4,7 @@ import os
 # from werkzeug import secure_filename
 from flask import Flask, render_template, request, session, redirect, flash
 import datetime
-from flask_cores import CORS
+from flask_cors import CORS
 
 # import mysql.connector
 import json
