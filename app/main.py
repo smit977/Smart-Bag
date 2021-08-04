@@ -4,6 +4,7 @@ import os
 # from werkzeug import secure_filename
 from flask import Flask, render_template, request, session, redirect, flash
 import datetime
+from flask_cores import CORS
 
 # import mysql.connector
 import json
@@ -17,7 +18,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from flask import jsonify
 
 app = Flask(__name__)
-
+CORS(app)
 
 def manipulate(data):
     # extracting data
