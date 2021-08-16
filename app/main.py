@@ -21,11 +21,13 @@ app = Flask(__name__)
 CORS(app)
 
 def manipulate(data):
+    for i, col in enumerate(data.columns):
+        data.iloc[:, i] = data.iloc[:, i].str.replace('"', '')
     # extracting data
-    data["day"] = pd.DatetimeIndex(data["date"]).day
+    data["month"] = pd.DatetimeIndex(data["date"]).month
 
     # getting latest purchase data
-    latest = data.loc[data.day == max(data.day)]
+    latest = data.loc[data.month == max(data.month)]
 
     latest["combine"] = latest["sub"] + latest["category"]
 
@@ -50,12 +52,20 @@ def recommedation(lates_index, all):
             lst = list(enumerate(similarity[i]))
             lst = sorted(lst, key=lambda x: x[1], reverse=True)
 
-            lst = lst[
-                1:8
-            ]  # excluding first item since it is the requested movie itself
+            lst = lst[1:8]  
             for i in range(len(lst)):
                 a = lst[i][0]
-                l.append(all["device"][a])
+                l.append(all["Product"][a])
+                index.append(a)
+    elif len(lates_index) < 20:
+        for i in lates_index:
+            lst = list(enumerate(similarity[i]))
+            lst = sorted(lst, key=lambda x: x[1], reverse=True)
+
+            lst = lst[1:4]  
+            for i in range(len(lst)):
+                a = lst[i][0]
+                l.append(all["Product"][a])
                 index.append(a)
 
     else:
@@ -63,12 +73,10 @@ def recommedation(lates_index, all):
             lst = list(enumerate(similarity[i]))
 
             lst = sorted(lst, key=lambda x: x[1], reverse=True)
-            lst = lst[
-                1:6
-            ]  # excluding first item since it is the requested movie itself
+            lst = lst[1:3]
             for i in range(len(lst)):
                 a = lst[i][0]
-                l.append(all["device"][a])
+                l.append(all["Product"][a])
                 index.append(a)
 
     return [l, index]
@@ -90,11 +98,11 @@ def home(username):
     love = []
 
     for i in new_data:
-        love.append(i.split(","))
+        love.append(i.split('",'))
 
     love.pop()
 
-    label = ["date", "Product_id", "device", "Amount", "category", "sub"]
+    label = ["date", "Product_id", "Product", "Amount", "category", "sub"]
 
     myDict = {}
     for i in love:
@@ -105,22 +113,18 @@ def home(username):
     final = pd.DataFrame(myDict)
 
     latest_index, all = manipulate(final)
-
     # getting recommedation
     products, index = recommedation(latest_index, all)
 
     result = pd.DataFrame({"product": products, "index": index})
     result.index = index
-    print("before drop", result)
 
     result.drop_duplicates(subset="index", inplace=True)
 
-    print("after drop", result)
 
     final = pd.merge(result, all, how="left", left_index=True, right_index=True)
-
     product_ids = list(final.Product_id)
-    product_name = list(final.device)
+    product_name = list(final.Product)
     product_amount = list(final.Amount)
     re = []
     for i in range(len(product_ids)):
@@ -131,13 +135,9 @@ def home(username):
         }
         re.append(val)
 
-    # con={
-    #     'Id':product_ids,
-    #     'Name':product_name,
-    #     'Amount':product_amount
-    # }
+
 
     return jsonify(re)
 
 
-# app.run(debug=True)
+app.run(debug=True)
