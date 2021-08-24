@@ -29,10 +29,10 @@ def manipulate(data):
     # getting latest purchase data
     latest = data.loc[data.month == max(data.month)]
 
-    latest["combine"] = latest["sub"] + latest["category"]
+    latest["combine"] = latest["sub"] + latest["category"]+latest["Product"]
 
     all = data
-    all["combine"] = data["sub"] + data["category"]
+    all["combine"] = data["sub"] + data["category"]+data["Product"]
 
     lates_index = latest.index
 
@@ -123,15 +123,21 @@ def home(username):
 
 
     final = pd.merge(result, all, how="left", left_index=True, right_index=True)
+    final.drop_duplicates(subset="Product", inplace=True)
     product_ids = list(final.Product_id)
     product_name = list(final.Product)
     product_amount = list(final.Amount)
+    product_category = list(final.category)
+    final['sub']=final['sub'].astype('category')
+    product_sub=list(final['sub'])
     re = []
     for i in range(len(product_ids)):
         val = {
-            "pid": product_ids[i],
+            "product_id": product_ids[i],
             "productName": product_name[i],
-            "amount": product_amount[i],
+            "category":product_category[i],
+            "subCategory":product_sub[i],
+            "amount": product_amount[i]
         }
         re.append(val)
 
