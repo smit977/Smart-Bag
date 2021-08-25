@@ -85,65 +85,65 @@ def recommedation(lates_index, all):
 @app.route("/smart_bag/<username>", methods=["GET"])
 def home(username):
     # username=request.args.get('username')
-    print("Fuck you", username)
-    URL = f"https://smart-bag-rest-api.herokuapp.com/userdata/{username}"
-
-    r = requests.get(url=URL)
+    try:
+        URL = f"https://smart-bag-rest-api.herokuapp.com/userdata/{username}"
+        r = requests.get(url=URL)
 
     # extracting data in json format
-    data = r.text
+        data = r.text
 
-    new_data = data.split("\n")
+        new_data = data.split("\n")
 
-    love = []
+        love = []
 
-    for i in new_data:
-        love.append(i.split('",'))
+        for i in new_data:
+            love.append(i.split('",'))
 
-    love.pop()
+        love.pop()
 
-    label = ["date", "Product_id", "Product", "Amount", "category", "sub"]
+        label = ["date", "Product_id", "Product", "Amount", "category", "sub"]
 
-    myDict = {}
-    for i in love:
-        count = 0
-        for j in i:
-            myDict.setdefault(label[count], []).append(j)
-            count += 1
-    final = pd.DataFrame(myDict)
+        myDict = {}
+        for i in love:
+            count = 0
+            for j in i:
+                myDict.setdefault(label[count], []).append(j)
+                count += 1
+        final = pd.DataFrame(myDict)
 
-    latest_index, all = manipulate(final)
+        latest_index, all = manipulate(final)
     # getting recommedation
-    products, index = recommedation(latest_index, all)
+        products, index = recommedation(latest_index, all)
 
-    result = pd.DataFrame({"product": products, "index": index})
-    result.index = index
+        result = pd.DataFrame({"product": products, "index": index})
+        result.index = index
 
-    result.drop_duplicates(subset="index", inplace=True)
-
-
-    final = pd.merge(result, all, how="left", left_index=True, right_index=True)
-    final.drop_duplicates(subset="Product", inplace=True)
-    product_ids = list(final.Product_id)
-    product_name = list(final.Product)
-    product_amount = list(final.Amount)
-    product_category = list(final.category)
-    final['sub']=final['sub'].astype('category')
-    product_sub=list(final['sub'])
-    re = []
-    for i in range(len(product_ids)):
-        val = {
-            "product_id": product_ids[i],
-            "productName": product_name[i],
-            "category":product_category[i],
-            "subCategory":product_sub[i],
-            "amount": product_amount[i]
-        }
-        re.append(val)
+        result.drop_duplicates(subset="index", inplace=True)
 
 
+        final = pd.merge(result, all, how="left", left_index=True, right_index=True)
+        final.drop_duplicates(subset="Product", inplace=True)
+        product_ids = list(final.Product_id)
+        product_name = list(final.Product)
+        product_amount = list(final.Amount)
+        product_category = list(final.category)
+        final['sub']=final['sub'].astype('category')
+        product_sub=list(final['sub'])
+        re = []
+        for i in range(len(product_ids)):
+            val = {
+                "id": product_ids[i],
+                "productName": product_name[i],
+                "category":product_category[i],
+                "subCategory":product_sub[i],
+                "amount": product_amount[i]
+            }
+            re.append(val)
 
-    return jsonify(re)
 
+
+        return jsonify(re)
+    except:
+        return "The Data is currupted"
 
 # app.run(debug=True)
