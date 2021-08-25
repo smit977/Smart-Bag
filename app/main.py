@@ -144,6 +144,7 @@ def home(username):
 
         return jsonify(re)
     except:
-        return "The Data is currupted"
+        return jsonify([]),204
 
 # app.run(debug=True)
+
