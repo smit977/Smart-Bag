@@ -112,7 +112,7 @@ def home(username):
         final = pd.DataFrame(myDict)
 
         latest_index, all = manipulate(final)
-    # getting recommedation
+
         products, index = recommedation(latest_index, all)
 
         result = pd.DataFrame({"product": products, "index": index})
