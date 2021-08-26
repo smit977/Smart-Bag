@@ -7,3 +7,6 @@ This application follows the concept of a smart bag; we need the user's purchase
 
 Here is the application link:-https://github.com/DGamer007/Smart-Bag
 
+Contributors
+
+[smit Prajapti](https://github.com/smit977) [Dhruv Prajapati](https://github.com/DGamer007)
